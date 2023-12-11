@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import datetime
 from pathlib import Path
 import os
-
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -87,15 +87,14 @@ WSGI_APPLICATION = 'hack_project.wsgi.application'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = 'AKIAS7QSBBMPO4KVRB54'  # Replace with your AWS access key ID
-AWS_SECRET_ACCESS_KEY = '5r5XBa+6FA1L8HoxnNizYVse7wwhPBhu0vQ6LDk8'  # Replace with your AWS secret access key
-AWS_STORAGE_BUCKET_NAME = 'prjctbckt'  # Replace with your AWS S3 bucket name
-AWS_S3_REGION_NAME = 'ap-south-1'
+
+load_dotenv('key.env')
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-
-
-
-
 
 
 

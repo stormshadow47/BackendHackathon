@@ -1,3 +1,4 @@
+import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from hack_app.models import FileInformation
@@ -8,6 +9,7 @@ from django.http import JsonResponse
 from hack_app.models import SensorData
 from hack_app.serializers import SensorDataSerializer
 import json
+from rest_framework import status
 
 
 def get_csrf_token(request):
@@ -16,27 +18,30 @@ def get_csrf_token(request):
 
 class upload_to_s3(APIView):
     def post(self, request):
-        credentials_file = request.FILES.get('credentials')
+        credentials_file_path = 'D:/key/credentials'  # Full path to the file
 
-        if credentials_file:
+        if os.path.exists(credentials_file_path):
             try:
-                # AWS S3 Configuration
-                s3 = boto3.client('s3',
-                                  aws_access_key_id='AKIAS7QSBBMPO4KVRB54',
-                                  aws_secret_access_key='5r5XBa+6FA1L8HoxnNizYVse7wwhPBhu0vQ6LDk8',
-                                  region_name='ap-south-1')
+                # AWS S3 Configuration (Ensure your environment variables are set)
+                s3 = boto3.client(
+                    's3',
+                    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+                    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
+                    region_name=os.environ.get('AWS_REGION')
+                )
 
                 # Bucket and Key (File Path) in S3
                 bucket_name = 'prjctbckt'
-                s3_file_path = credentials_file.name  # Just the file name without any folder
-                
+                s3_file_path = os.path.basename(credentials_file_path)
+
                 # Uploading file to S3
-                s3.upload_fileobj(credentials_file, bucket_name, s3_file_path)
+                with open(credentials_file_path, 'rb') as file:
+                    s3.upload_fileobj(file, bucket_name, s3_file_path)
 
                 # Save information to your database
                 s3_url = f"https://{bucket_name}.s3.amazonaws.com/{s3_file_path}"
                 file_info = FileInformation.objects.create(
-                    filename=credentials_file.name,
+                    filename=s3_file_path,
                     s3_url=s3_url
                 )
 
@@ -46,9 +51,8 @@ class upload_to_s3(APIView):
 
             except Exception as e:
                 return Response({"message": str(e)}, status=500)
-
-        return Response({"message": "No file provided"}, status=400)
-
+        else:
+            return Response({"message": "File not found at specified path"}, status=400)
 
 class get_file_information(APIView):
     def get(self, request, file_id):
