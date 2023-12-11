@@ -52,7 +52,7 @@ The project provides an API to upload files to an AWS S3 bucket securely. It als
 
 # API endpoints:
 
-- GET /api/get-csrf-token/: Fetch the CSRF token (Place it in the header section of Postman with key X-CSRF token)
+- GET /api/get-csrf-token/: Fetch the CSRF token (Place it in the header section of Postman with key "X-CSRF token")
 - POST /api/upload/: Upload a file to AWS S3 bucket. (Upload the credntialsfile through post request in Postman)
 - GET /api/file/file_id/: Get file information.
 - GET /api/get-sensor-data/: Fetch the sensor data from the JSON file and return it in JSON format to frontend.
